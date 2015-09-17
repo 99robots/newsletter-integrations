@@ -37,16 +37,57 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	public $text_domain = '';
 
 	/**
+	 * table_name
+	 *
+	 * (default value: '')
+	 *
+	 * @var string
+	 * @access public
+	 */
+	public $table_name = '';
+
+	/**
+	 * newsletter_table_name
+	 *
+	 * (default value: '')
+	 *
+	 * @var string
+	 * @access public
+	 */
+	public $newsletter_table_name = '';
+
+	/**
 	 * Called when the object is first created
 	 *
 	 * @access public
 	 * @param mixed $prefix
 	 * @return void
 	 */
-	function __construct( $prefix = '', $text_domain = '' ) {
+	function __construct( $prefix = '', $text_domain = '', $table_name = '', $new_table_name = '' ) {
 
 		$this->prefix = $prefix;
 		$this->text_domain = $text_domain;
+		$this->table_name = $table_name;
+		$this->news_table_name = $new_table_name;
+
+		$this->include_scripts();
+
+	}
+
+	/**
+	 * Includes all scripts for the Newsletter Form
+	 *
+	 * @access public
+	 * @return void
+	 */
+	function include_scripts() {
+
+		wp_register_script( 'newsletter-integrations-form-js', plugins_url( 'js/newsletter-integrations.js', dirname(__FILE__)), array('jquery') );
+		wp_enqueue_script( 'newsletter-integrations-form-js' );
+		wp_localize_script( 'newsletter-integrations-form-js', 'nnr_new_int_form_data' , array(
+			'prefix'		=> $this->prefix,
+			'ajaxurl'       => admin_url( 'admin-ajax.php' ),
+		));
 
 	}
 
@@ -56,7 +97,13 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	 * @access public
 	 * @return void
 	 */
-	function display_form( $newsletter, $args = array() ) {
+	function display_form( $data_id, $newsletter, $args = array() ) {
+
+		// Do not output form if data id is not provided
+
+		if ( !isset($data_id) || empty($data_id) ) {
+			return false;
+		}
 
 		// Default values for the args parameter
 
@@ -69,6 +116,9 @@ class NNR_Newsletter_Integrations_Form_v1 {
 			'subscribe_icon_place'		=> 'after',
 			'subscribe_icon'			=> 'fa-paper-plane',
 			'button_text'				=> __('Subscribe', $this->text_domain),
+			'success_action'			=> 'message',
+			'success_message'			=> __('Welcome to the community!', $this->text_domain),
+			'success_url'				=> '',
 		), $args);
 
 		// Create the code output
@@ -77,7 +127,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 			if ( $newsletter['newsletter'] == 'feedburner' ) {
 
-				$code .= '<form class="' . $this->prefix . 'form" role="form" action="http://feedburner.google.com/fb/a/mailverify" method="post" target="' . $this->prefix . 'newsletter-window" onsubmit="window.open(\'http://feedburner.google.com/fb/a/mailverify?uri=' . esc_attr( $newsletter['newsletter']['feedburner']['id'] ) . '\', \'' . $this->prefix . 'newsletter-window\', \'scrollbars=yes,width=550,height=520\');return true">
+				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->news_table_name . '" class="' . $this->prefix . 'form" role="form" action="http://feedburner.google.com/fb/a/mailverify" method="post" target="' . $this->prefix . 'newsletter-window" onsubmit="window.open(\'http://feedburner.google.com/fb/a/mailverify?uri=' . esc_attr( $newsletter['newsletter']['feedburner']['id'] ) . '\', \'' . $this->prefix . 'newsletter-window\', \'scrollbars=yes,width=550,height=520\');return true">
 					<div class="form-group col-md-8">
 						<input type="mailinput" class="form-control" name="email" placeholder="' . $args['email_placeholder'] . '"/>
 					</div>';
@@ -113,7 +163,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 			} else {
 
-				$code .= '<form class="' . $this->prefix . 'newsletter ' . $this->prefix . 'form" method="post" role="form" novalidate="true">
+				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->news_table_name . '" class="' . $this->prefix . 'newsletter ' . $this->prefix . 'form" method="post" role="form" novalidate="true">
 
 					<p class="' . $this->prefix . 'newsletter-type" data-newsletter="' . $newsletter['newsletter'] . '" style="display:none !important;"></p>';
 
