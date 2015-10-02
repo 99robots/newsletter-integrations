@@ -23,6 +23,7 @@ jQuery(document).ready(function($) {
 			'text_domain': $(this).attr('data-text-domain'),
 			'table_name': $(this).attr('data-table-name'),
 			'news_table_name': $(this).attr('data-news-table-name'),
+			'stats_table_name': $(this).attr('data-stats-table-name'),
 			'type': $(this).find('.' + nnr_new_int_form_data.prefix + 'newsletter-type').data('newsletter'),
 			'email': $(this).find('.' + nnr_new_int_form_data.prefix + 'email').val(),
 			'first_name': $(this).find('.' + nnr_new_int_form_data.prefix + 'first-name').val(),

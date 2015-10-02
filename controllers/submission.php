@@ -98,7 +98,7 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 
 		$today = date('Y-m-d');
 
-		$result = $wpdb->query($wpdb->prepare('INSERT IGNORE INTO ' . $this->get_table_name() . ' (
+		$result = $wpdb->query($wpdb->prepare('INSERT IGNORE INTO `' . $this->get_table_name() . '` (
 			`date`,
 			`data_id`,
 			`email`,
@@ -143,19 +143,19 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 		// All Emails, After Date
 
 		else if ($start != null && $end == null && $email == null) {
-			$query = $wpdb->prepare('SELECT ' . $select . ' FROM ' . $this->get_table_name() . ' WHERE `date` = %s', $start);
+			$query = $wpdb->prepare('SELECT ' . $select . ' FROM `' . $this->get_table_name() . '` WHERE `date` = %s', $start);
 		}
 
 		// All Emails, Date Range
 
 		else if ($start != null && $end != null && $email == null) {
-			$query = $wpdb->prepare('SELECT ' . $select . ' FROM ' . $this->get_table_name() . ' WHERE `date` >= %s AND `date` <= %s', $start, $end);
+			$query = $wpdb->prepare('SELECT ' . $select . ' FROM `' . $this->get_table_name() . '` WHERE `date` >= %s AND `date` <= %s', $start, $end);
 		}
 
 		// Single Email
 
 		else if ($start == null && $end == null && $email != null) {
-			$query = $wpdb->prepare('SELECT ' . $select . ' FROM ' . $this->get_table_name() . ' WHERE `email` = %d', $email);
+			$query = $wpdb->prepare('SELECT ' . $select . ' FROM `' . $this->get_table_name() . '` WHERE `email` = %d', $email);
 		}
 
 		// No query was created
@@ -188,7 +188,7 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 
 		// Delete Email
 
-		$result = $wpdb->query($wpdb->prepare('DELETE FROM ' . $this->get_table_name() . ' WHERE `email` = %d', $email));
+		$result = $wpdb->query($wpdb->prepare('DELETE FROM `' . $this->get_table_name() . '` WHERE `email` = %d', $email));
 
 		return $result;
 
@@ -205,7 +205,7 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 
 		global $wpdb;
 
-		return '`' . $wpdb->prefix . $this->table_name . '`';
+		return $wpdb->prefix . $this->table_name;
 	}
 
 }
@@ -298,6 +298,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -358,12 +362,18 @@ function nnr_new_int_add_email_v1() {
 
             if (isset($result['email'])) {
 
+	            do_action('nnr_news_int_submission_success', $_POST['data_id'], $_POST['stats_table_name']);
+
 				echo json_encode(array(
 					'id'				=> $_POST['data_id'],
 					'status'			=> 'check',
 					'success_action'	=> $success_action,
 					'url'				=> $success_url,
 					'message'			=> $success_mesage,
+					'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+						'data_id' 		=> $_POST['data_id'],
+						'table_name'	=> $_POST['stats_table_name']
+					)),
 				));
 
 				die();
@@ -416,6 +426,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -455,6 +469,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -510,6 +528,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -567,6 +589,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -621,6 +647,10 @@ function nnr_new_int_add_email_v1() {
 						'success_action'	=> $success_action,
 						'url'				=> $success_url,
 						'message'			=> $success_mesage,
+						'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+							'data_id' 		=> $_POST['data_id'],
+							'table_name'	=> $_POST['stats_table_name']
+						)),
 					));
 
 					die();
@@ -652,6 +682,10 @@ function nnr_new_int_add_email_v1() {
 					'success_action'	=> $success_action,
 					'url'				=> $success_url,
 					'message'			=> $success_mesage,
+					'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+						'data_id' 		=> $_POST['data_id'],
+						'table_name'	=> $_POST['stats_table_name']
+					)),
 				));
 
 				die();
@@ -684,7 +718,6 @@ function nnr_new_int_add_email_v1() {
 			'email' 	=> $_POST['email'],
 			'firstname'	=> $_POST['first_name'],
 			'lastname'	=> $_POST['last_name'],
-			'referer'	=> 'Optin Fire',
 		), false);
 
 		// Add to List
@@ -699,6 +732,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();
@@ -754,6 +791,10 @@ function nnr_new_int_add_email_v1() {
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
+				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'data_id' 		=> $_POST['data_id'],
+					'table_name'	=> $_POST['stats_table_name']
+				)),
 			));
 
 			die();

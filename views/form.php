@@ -57,18 +57,29 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	public $newsletter_table_name = '';
 
 	/**
+	 * stats_table_name
+	 *
+	 * (default value: '')
+	 *
+	 * @var string
+	 * @access public
+	 */
+	public $stats_table_name = '';
+
+	/**
 	 * Called when the object is first created
 	 *
 	 * @access public
 	 * @param mixed $prefix
 	 * @return void
 	 */
-	function __construct( $prefix = '', $text_domain = '', $table_name = '', $new_table_name = '' ) {
+	function __construct( $prefix = '', $text_domain = '', $table_name = '', $newsletter_table_name = '', $stats_table_name = '' ) {
 
 		$this->prefix = $prefix;
 		$this->text_domain = $text_domain;
 		$this->table_name = $table_name;
-		$this->news_table_name = $new_table_name;
+		$this->newsletter_table_name = $newsletter_table_name;
+		$this->stats_table_name = $stats_table_name;
 
 		$this->include_scripts();
 
@@ -105,9 +116,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 			return false;
 		}
 
-		// Default values for the args parameter
-
-		$args = apply_filters('nnr_new_int_default_args', array(
+		$args = array_merge(array(
 			'first_name'				=> false,
 			'last_name'					=> false,
 			'first_name_placeholder'	=> __('First Name', $this->text_domain),
@@ -119,7 +128,13 @@ class NNR_Newsletter_Integrations_Form_v1 {
 			'success_action'			=> 'message',
 			'success_message'			=> __('Welcome to the community!', $this->text_domain),
 			'success_url'				=> '',
+			'text_color'				=> '#ffffff',
+			'bg_color'					=> '#f15928',
 		), $args);
+
+		// Default values for the args parameter
+
+		$args = apply_filters('nnr_new_int_default_args', $args);
 
 		// Create the code output
 
@@ -127,7 +142,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 			if ( $newsletter['newsletter'] == 'feedburner' ) {
 
-				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->news_table_name . '" class="' . $this->prefix . 'form" role="form" action="http://feedburner.google.com/fb/a/mailverify" method="post" target="' . $this->prefix . 'newsletter-window" onsubmit="window.open(\'http://feedburner.google.com/fb/a/mailverify?uri=' . esc_attr( $newsletter['newsletter']['feedburner']['id'] ) . '\', \'' . $this->prefix . 'newsletter-window\', \'scrollbars=yes,width=550,height=520\');return true">
+				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->newsletter_table_name . '" data-stats-table-name="' . $this->stats_table_name . '" class="' . $this->prefix . 'form" role="form" action="http://feedburner.google.com/fb/a/mailverify" method="post" target="' . $this->prefix . 'newsletter-window" onsubmit="window.open(\'http://feedburner.google.com/fb/a/mailverify?uri=' . esc_attr( $newsletter['newsletter']['feedburner']['id'] ) . '\', \'' . $this->prefix . 'newsletter-window\', \'scrollbars=yes,width=550,height=520\');return true">
 					<div class="form-group col-md-8">
 						<input type="mailinput" class="form-control" name="email" placeholder="' . $args['email_placeholder'] . '"/>
 					</div>';
@@ -136,7 +151,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 					$code .= '<div class="form-group col-md-4 text-center">';
 
-						$code .= '<button type="submit" class="' . $this->prefix . 'submit btn" name="submit">';
+						$code .= '<button type="submit" class="' . $this->prefix . 'submit btn" name="submit" style="background-color:' . $args['bg_color'] . ';color:' . $args['text_color'] . ';">';
 
 							if (isset($args['subscribe_icon_place']) && $args['subscribe_icon_place'] == 'before') {
 								$code .= '<i class="fa ' . $args['subscribe_icon'] . '"></i>';
@@ -163,7 +178,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 			} else {
 
-				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->news_table_name . '" class="' . $this->prefix . 'newsletter ' . $this->prefix . 'form" method="post" role="form" novalidate="true">
+				$code .= '<form data-id="' . $data_id . '" data-text-domain="' . $this->text_domain . '" data-table-name="' . $this->table_name . '" data-news-table-name="' . $this->newsletter_table_name . '" data-stats-table-name="' . $this->stats_table_name . '" class="' . $this->prefix . 'newsletter ' . $this->prefix . 'form" method="post" role="form" novalidate="true">
 
 					<p class="' . $this->prefix . 'newsletter-type" data-newsletter="' . $newsletter['newsletter'] . '" style="display:none !important;"></p>';
 
@@ -179,7 +194,7 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 					// Subcribe button
 
-					$code .= '<button type="submit" class="' . $this->prefix . 'submit btn" name="submit">';
+					$code .= '<button type="submit" class="' . $this->prefix . 'submit btn" name="submit" style="background-color:' . $args['bg_color'] . ';color:' . $args['text_color'] . ';">';
 
 						if (isset($args['subscribe_icon_place']) && $args['subscribe_icon_place'] == 'before') {
 							$code .= '<i class="fa ' . $args['subscribe_icon'] . '" style="padding-right: 5px;"></i>';

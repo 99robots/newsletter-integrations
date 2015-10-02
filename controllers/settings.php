@@ -47,6 +47,17 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	public $text_domain = '';
 
 	/**
+	 * aweber_app_id
+	 *
+	 * (default value: '343d929f')
+	 *
+	 * @var string
+	 * @access public
+	 * @static
+	 */
+	private $aweber_app_id = '343d929f';
+
+	/**
 	 * Called when the object is first created
 	 *
 	 * @access public
@@ -75,7 +86,10 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		wp_register_script( 'selectize-js', plugins_url( 'js/selectize.min.js', dirname(__FILE__)), array('jquery') );
 		wp_enqueue_script( 'selectize-js' );
 
-		wp_register_script( 'newsletter-integrations-js', plugins_url( 'js/settings.js', dirname(__FILE__)), array('jquery') );
+		wp_enqueue_style('wp-color-picker');
+		wp_enqueue_script('wp-color-picker');
+
+		wp_register_script( 'newsletter-integrations-js', plugins_url( 'js/settings.js', dirname(__FILE__)), array('jquery', 'wp-color-picker') );
 		wp_enqueue_script( 'newsletter-integrations-js' );
 		wp_localize_script( 'newsletter-integrations-js', 'nnr_new_int_data' , array(
 			'prefix'		=> $this->prefix,
@@ -129,6 +143,23 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		echo $this->display_activecampaign_list($newsletter_settings['activecampaign']['list']);
 
 		echo $this->display_feedburner_id($newsletter_settings['feedburner']['id']);
+
+		echo $this->display_first_name_placeholder($newsletter_settings['first_name_placeholder']);
+		echo $this->display_last_name_placeholder($newsletter_settings['last_name_placeholder']);
+		echo $this->display_email_placeholder($newsletter_settings['email_placeholder']);
+
+		echo $this->display_first_name($newsletter_settings['first_name']);
+		echo $this->display_last_name($newsletter_settings['last_name']);
+
+		echo $this->display_success_action($newsletter_settings['success_action']);
+		echo $this->display_success_message($newsletter_settings['success_message']);
+		echo $this->display_success_url($newsletter_settings['success_url']);
+
+		echo $this->display_button_text($newsletter_settings['button_text']);
+		echo $this->display_subscribe_icon($newsletter_settings['subscribe_icon']);
+		echo $this->display_subscribe_icon_place($newsletter_settings['subscribe_icon_place']);
+		echo $this->display_text_color($newsletter_settings['text_color']);
+		echo $this->display_bg_color($newsletter_settings['bg_color']);
 
 	}
 
@@ -189,7 +220,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mailchimp">
 			<label for="' . $this->prefix . 'newsletter-mailchimp-optin" class="col-sm-3 control-label">' . __('MailChimp Double Opt-in', $this->text_domain) . '</label>
 			<div class="col-sm-9">
-				<input class="form-control" id="' . $this->prefix . 'newsletter-mailchimp-optin" name="' . $this->prefix . 'newsletter-mailchimp-optin" type="checkbox" ' . (isset($mailchimp_optin) && $mailchimp_optin ? 'checked="checked"' : '') . '/>' .
+				<input id="' . $this->prefix . 'newsletter-mailchimp-optin" name="' . $this->prefix . 'newsletter-mailchimp-optin" type="checkbox" ' . (isset($mailchimp_optin) && $mailchimp_optin ? 'checked="checked"' : '') . '/>' .
 				$help_text .
 			'</div>
 		</div>';
@@ -214,7 +245,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- MailChimp API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mailchimp">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mailchimp">
 			<label for="' . $this->prefix . 'newsletter-mailchimp-api-key" class="col-sm-3 control-label">' . __('MailChimp', $this->text_domain) . ' <a href="http://kb.mailchimp.com/accounts/management/about-api-keys" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-mailchimp-api-key" name="' . $this->prefix . 'newsletter-mailchimp-api-key" type="text" value="' . (isset($mailchimp_apikey) ? $mailchimp_apikey : '') . '" />' .
@@ -242,7 +273,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- MailChimp List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mailchimp">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mailchimp">
 			<label for="' . $this->prefix . 'newsletter-mailchimp-list" class="col-sm-3 control-label">' . __('MailChimp List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-mailchimp-list" name="' . $this->prefix . 'newsletter-mailchimp-list" data-list="' . (isset($mailchimp_list) ? $mailchimp_list : '') . '"></select>' .
@@ -264,14 +295,14 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	function display_aweber_actions( $aweber_access_key ) {
 
 		$code = '<!-- Aweber Actions -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber">
 			<label class="col-sm-3 control-label">' . __('Step 1:', $this->text_domain) . '</label>
 			<div class="col-sm-9">
-				<a href="https://auth.aweber.com/1.0/oauth/authorize_app/<?php echo self::$aweber_app_id; ?>" target="_blank" class="btn btn-default ' . $this->prefix . 'newsletter-aweber-connect">' . (isset($aweber_access_key) && $aweber_access_key == '' ? __('Get Code', $this->text_domain) : __('Reconnect Account', $this->text_domain)) . '</a>
+				<a href="https://auth.aweber.com/1.0/oauth/authorize_app/' .  $this->aweber_app_id . '" target="_blank" class="btn btn-default ' . $this->prefix . 'newsletter-aweber-connect">' . (isset($aweber_access_key) && $aweber_access_key == '' ? __('Get Code', $this->text_domain) : __('Reconnect Account', $this->text_domain)) . '</a>
 			</div>
 		</div>
 
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber ' . (isset($aweber_access_key) && $aweber_access_key != '' ? 'hidden' : '') . '">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber ' . (isset($aweber_access_key) && $aweber_access_key != '' ? 'hidden' : '') . '">
 			<label class="col-sm-3 control-label">' . __('Step 2:', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-aweber-code" name="' . $this->prefix . 'newsletter-aweber-code" type="text" value=""/>
@@ -411,7 +442,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- AWeber List ID -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-aweber">
 			<label for="' . $this->prefix . 'newsletter-aweber-list-id" class="col-sm-3 control-label">' . __('List ID', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-aweber-list-id" name="' . $this->prefix . 'newsletter-aweber-list-id" data-list="' . (isset($aweber_list_id) ? $aweber_list_id : '') . '"></select>' .
@@ -439,7 +470,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Get Response API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-getresponse">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-getresponse">
 			<label for="' . $this->prefix . 'newsletter-getresponse-api-key" class="col-sm-3 control-label">' . __('Get Response', $this->text_domain) . ' <a href="http://www.getresponse.com/learning-center/glossary/api-key.html" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-getresponse-api-key" name="' . $this->prefix . 'newsletter-getresponse-api-key" type="text" value="' . (isset($getresponse_api_key) ? $getresponse_api_key :'') . '"/>' .
@@ -467,7 +498,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Get Response List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-getresponse">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-getresponse">
 			<label for="' . $this->prefix . 'newsletter-getresponse-campaign" class="col-sm-3 control-label">' . __('Get Response List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-getresponse-campaign" name="' . $this->prefix . 'newsletter-getresponse-campaign" data-campaign="' . (isset($getresponse_campaign) ? $getresponse_campaign : '' ) . '"></select>' .
@@ -495,7 +526,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Campaign Monitor API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
 			<label for="' . $this->prefix . 'newsletter-campaignmonitor-api-key" class="col-sm-3 control-label">' . __('Campaign Monitor', $this->text_domain) . ' <a href="http://help.campaignmonitor.com/topic.aspx?t=206" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-campaignmonitor-api-key" name="' . $this->prefix . 'newsletter-campaignmonitor-api-key" type="text" value="' . (isset($campaignmonitor_api_key) ? $campaignmonitor_api_key : '' ) . '" />' .
@@ -523,7 +554,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Campaign Monitor Client -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
 			<label for="' . $this->prefix . 'newsletter-campaignmonitor-client" class="col-sm-3 control-label">' . __('Campaign Monitor Client', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-campaignmonitor-client" name="' . $this->prefix . 'newsletter-campaignmonitor-client" data-client="' . (isset($campaignmonitor_client) ? $campaignmonitor_client : '') . '></select>' .
@@ -551,7 +582,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Campaign Monitor List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-campaignmonitor">
 			<label for="' . $this->prefix . 'newsletter-campaignmonitor-list" class="col-sm-3 control-label">' . __('Campaign Monitor List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-campaignmonitor-list" name="' . $this->prefix . 'newsletter-campaignmonitor-list" data-list="' . (isset($campaignmonitor_list) ? $campaignmonitor_list : '') . '"></select>' .
@@ -579,7 +610,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Mad Mimi Username -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
 			<label for="' . $this->prefix . 'newsletter-madmimi-username" class="col-sm-3 control-label">' . __('Mad Mimi Username / Email', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-madmimi-username" name="' . $this->prefix . 'newsletter-madmimi-username" type="text" value="' . (isset($madmimi_username) ? $madmimi_username :'') . '" />' .
@@ -607,7 +638,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Mad Mimi API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
 			<label for="' . $this->prefix . 'newsletter-madmimi-api-key" class="col-sm-3 control-label">' . __('Mad Mimi', $this->text_domain) . ' <a href="http://help.madmimi.com/where-can-i-find-my-api-key/" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-madmimi-api-key" name="' . $this->prefix . 'newsletter-madmimi-api-key" type="text" value="' . (isset($madmimi_api_key) ? $madmimi_api_key :'') . '" />' .
@@ -635,7 +666,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Mad Mimi List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-madmimi">
 			<label for="' . $this->prefix . 'newsletter-madmimi-list" class="col-sm-3 control-label">' . __('Mad Mimi List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-madmimi-list" name="' . $this->prefix . 'newsletter-madmimi-list" data-list="' . (isset($madmimi_list) ? $madmimi_list : '') . '"></select>' .
@@ -663,7 +694,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Infusionsoft App ID -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
 			<label for="' . $this->prefix . 'newsletter-infusionsoft-app-id" class="col-sm-3 control-label">' . __('Infusionsoft App ID', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-infusionsoft-app-id" name="' . $this->prefix . 'newsletter-infusionsoft-app-id" type="text" value="' . (isset($infusionsoft_app_id) ? $infusionsoft_app_id :'') . '"/>' .
@@ -691,7 +722,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Infusionsoft API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
 			<label for="' . $this->prefix . 'newsletter-infusionsoft-api-key" class="col-sm-3 control-label">' . __('Infusionsoft', $this->text_domain) . ' <a href="http://ug.infusionsoft.com/article/AA-00442/0/How-do-I-enable-the-Infusionsoft-API-and-generate-an-API-Key.html" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-infusionsoft-api-key" name="' . $this->prefix . 'newsletter-infusionsoft-api-key" type="text" value="' . (isset($infusionsoft_api_key) ? $infusionsoft_api_key :'') . '" />' .
@@ -719,7 +750,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Infusionsoft List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-infusionsoft">
 			<label for="' . $this->prefix . 'newsletter-infusionsoft-list" class="col-sm-3 control-label">' . __('Infusionsoft List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-infusionsoft-list" name="' . $this->prefix . 'newsletter-infusionsoft-list" data-list="' . (isset($infusionsoft_list) ? $infusionsoft_list : '') . '"></select>' .
@@ -747,7 +778,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- MyMail List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mymail">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-mymail">
 			<label for="' . $this->prefix . 'newsletter-aweber-list-id" class="col-sm-3 control-label">' . __('MyMail List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-mymail-list" name="' . $this->prefix . 'newsletter-mymail-list" data-list="' . (isset($mymail_list) ? $mymail_list : '') . '"></select>' .
@@ -775,7 +806,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Active Campaign App URL -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
 			<label for="' . $this->prefix . 'newsletter-activecampaign-app-url" class="col-sm-3 control-label">' . __('Active Campaign', $this->text_domain) . ' <a href="http://www.activecampaign.com/help/using-the-api/" target="_blank">' . __('API URL', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-activecampaign-app-url" name="' . $this->prefix . 'newsletter-activecampaign-app-url" type="text" value="' . (isset($activecampaign_app_url) ? $activecampaign_app_url :'') . '" />' .
@@ -803,7 +834,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Active Campaign API Key -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
 			<label for="' . $this->prefix . 'newsletter-activecampaign-api-key" class="col-sm-3 control-label">' . __('Active Campaign', $this->text_domain) . ' <a href="http://www.activecampaign.com/help/using-the-api/" target="_blank">' . __('API Key', $this->text_domain) . '</a></label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-activecampaign-api-key" name="' . $this->prefix . 'newsletter-activecampaign-api-key" type="text" value="' . (isset($activecampaign_api_key) ? $activecampaign_api_key :'') . '" />' .
@@ -831,7 +862,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Active Campaign List -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-activecampaign">
 			<label for="' . $this->prefix . 'newsletter-activecampaign-list" class="col-sm-3 control-label">' . __('Active Campaign List', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<select id="' . $this->prefix . 'newsletter-activecampaign-list" name="' . $this->prefix . 'newsletter-activecampaign-list" data-list="' . (isset($activecampaign_list) ? $activecampaign_list : '') . '"></select>' .
@@ -859,10 +890,384 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		}
 
 		$code = '<!-- Feedburner -->
-		<div class="form-group has-feedback ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-feedburner">
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-feedburner">
 			<label for="' . $this->prefix . 'newsletter-aweber-list-id" class="col-sm-3 control-label">' . __('List ID', $this->text_domain) . '</label>
 			<div class="col-sm-9">
 				<input class="form-control" id="' . $this->prefix . 'newsletter-feedburner-id" name="' . $this->prefix . 'newsletter-feedburner-id" type="text" value="' .  (isset($feedburner_id) ? $feedburner_id :'') . '" />' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display First Name Placeholder field
+	 *
+	 * @access public
+	 * @param mixed $first_name_placeholder
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_first_name_placeholder( $first_name_placeholder, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- First Name Placeholder -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordpress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-infusionsoft ' . $this->prefix . 'newsletter-mymail ' . $this->prefix . 'newsletter-activecampaign">
+			<label for="' . $this->prefix . 'newsletter-first-name-placeholder" class="col-sm-3 control-label">' . __('First Name Placeholder Text', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-first-name-placeholder" name="' . $this->prefix . 'newsletter-first-name-placeholder" type="text" value="' . (isset($first_name_placeholder) ? esc_attr($first_name_placeholder) : __('First Name', $this->text_domain)) . '"/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Last Name Placeholder field
+	 *
+	 * @access public
+	 * @param mixed $last_name_placeholder
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_last_name_placeholder( $last_name_placeholder, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Last Name Placeholder -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordpress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-infusionsoft ' . $this->prefix . 'newsletter-mymail ' . $this->prefix . 'newsletter-activecampaign">
+			<label for="' . $this->prefix . 'newsletter-last-name-placeholder" class="col-sm-3 control-label">' . __('Last Name Placeholder Text', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-last-name-placeholder" name="' . $this->prefix . 'newsletter-last-name-placeholder" type="text" value="' .  (isset($last_name_placeholder) ? esc_attr($last_name_placeholder) : __('Last Name', $this->text_domain)) . '"/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Email Placeholder field
+	 *
+	 * @access public
+	 * @param mixed $email_placeholder
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_email_placeholder( $email_placeholder, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Email Placeholder -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-email-placeholder" class="col-sm-3 control-label">' . __('Email Placeholder Text', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-email-placeholder" name="' . $this->prefix . 'newsletter-email-placeholder" type="text" value="' .  (isset($email_placeholder) ? esc_attr($email_placeholder) : __('Email', $this->text_domain)) . '"/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display First Name Field
+	 *
+	 * @access public
+	 * @param mixed $first_name
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_first_name( $first_name, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- First Name -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordpress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-infusionsoft">
+			<label for="' . $this->prefix . 'newsletter-first-name" class="col-sm-3 control-label">' . __('First Name', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input id="' . $this->prefix . 'newsletter-first-name" name="' . $this->prefix . 'newsletter-first-name" type="checkbox" ' .  (isset($first_name) && $first_name ? 'checked="checked"' : '') . '/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Last Name Field
+	 *
+	 * @access public
+	 * @param mixed $last_name
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_last_name( $last_name, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Last Name -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordpress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-infusionsoft ' . $this->prefix . 'newsletter-mymail ' . $this->prefix . 'newsletter-activecampaign">
+			<label for="' . $this->prefix . 'newsletter-last-name" class="col-sm-3 control-label">' . __('Last Name', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input id="' . $this->prefix . 'newsletter-last-name" name="' . $this->prefix . 'newsletter-last-name" type="checkbox" ' .  (isset($last_name) && $last_name ? 'checked="checked"' : '') . '/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display the Succes Action Field
+	 *
+	 * @access public
+	 * @param mixed $success_action
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_success_action( $success_action, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Success Action -->
+		<div class="form-group ' . $this->prefix . 'newsletter-div ' . $this->prefix . 'newsletter-wordPress-div ' . $this->prefix . 'newsletter-mailchimp-div ' . $this->prefix . 'newsletter-aweber-div ' . $this->prefix . 'newsletter-getresponse-div ' . $this->prefix . 'newsletter-campaignmonitor-div ' . $this->prefix . 'newsletter-madmimi-div">
+			<label for="' . $this->prefix . 'newsletter-success-action" class="col-sm-3 control-label">' . __('Success Action', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<select id="' . $this->prefix . 'newsletter-success-action" name="' . $this->prefix . 'newsletter-success-action">
+					<option value="message" ' . selected('message', $success_action, false) . '>' . __('Show a message', $this->text_domain) . '</option>
+					<option value="redirect" ' .  selected('redirect', $success_action, false) . '>' . __('Redirect to another page', $this->text_domain) . '</option>
+				</select>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display the Success Message Field
+	 *
+	 * @access public
+	 * @param mixed $success_message
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_success_message( $success_message, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Success Message -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordPress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-success-action ' . $this->prefix . 'newsletter-success-action-message">
+			<label for="' . $this->prefix . 'newsletter-success-message" class="col-sm-3 control-label">' . __('Success Message', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-success-message" name="' . $this->prefix . 'newsletter-success-message" type="text" value="' .  (isset($success_message) ? esc_attr($success_message) : __('Welcome to the community!', $this->text_domain)) . '" />' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display the Success URL field
+	 *
+	 * @access public
+	 * @param mixed $success_url
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_success_url( $success_url, $default = '', $help_text = null ){
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Success URL -->
+		<div class="form-group ' . $this->prefix . 'newsletter ' . $this->prefix . 'newsletter-wordPress ' . $this->prefix . 'newsletter-mailchimp ' . $this->prefix . 'newsletter-getresponse ' . $this->prefix . 'newsletter-campaignmonitor ' . $this->prefix . 'newsletter-madmimi ' . $this->prefix . 'newsletter-success-action ' . $this->prefix . 'newsletter-success-action-redirect">
+			<label for="' . $this->prefix . 'newsletter-success-url" class="col-sm-3 control-label">' . __('Success URL', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-success-url" name="' . $this->prefix . 'newsletter-success-url" type="text" value="' .  (isset($success_url) ? esc_url_raw($success_url) : get_site_url()) . '" />' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Button Text Field
+	 *
+	 * @access public
+	 * @param mixed $button_text
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_button_text( $button_text, $default = '', $help_text = null ) {
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Button Text -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-button-text" class="col-sm-3 control-label">' . __('Button Text', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input class="form-control" id="' . $this->prefix . 'newsletter-button-text" name="' . $this->prefix . 'newsletter-button-text" type="text" value="' .  (isset($button_text) ? esc_attr($button_text) : __('Subscribe', $this->text_domain)). '"/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Subscribe Icon Field
+	 *
+	 * @access public
+	 * @param mixed $subscribe_icon
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_subscribe_icon( $subscribe_icon, $default = '', $help_text = null ) {
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Subscribe Icon -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-subscribe-icon" class="col-sm-3 control-label">' . __('Subscribe Icon', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<button class="btn btn-default" name="' . $this->prefix . 'newsletter-subscribe-icon" data-iconset="fontawesome" data-icon="' .  (isset($subscribe_icon) ? $subscribe_icon : 'fa-paper-plane') . '" role="iconpicker"></button>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Subscribe Icon Place Field
+	 *
+	 * @access public
+	 * @param mixed $subscribe_icon_place
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_subscribe_icon_place( $subscribe_icon_place, $default = '', $help_text = null ) {
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Subscribe Icon Place -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-subscribe-icon-place" class="col-sm-3 control-label">' . __('Subscribe Icon Place', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default ' . (isset($subscribe_icon_place) && $subscribe_icon_place == 'before' ? 'active' : '') . '" for="' . $this->prefix . 'newsletter-subscribe-icon-place">
+						<input type="radio" name="' . $this->prefix . 'newsletter-subscribe-icon-place" id="' . $this->prefix . 'newsletter-subscribe-icon-place-before" value="before" ' . (isset($subscribe_icon_place) && $subscribe_icon_place == 'before' ? 'checked="checked"' : '') . '/> <i class="fa fa-outdent"></i> ' . __('Before', $this->text_domain) . '
+					</label>
+					<label class="btn btn-default ' . (isset($subscribe_icon_place) && $subscribe_icon_place == 'after' ? 'active' : '') . '" for="' . $this->prefix . 'newsletter-subscribe-icon-place">
+						<input type="radio" name="' . $this->prefix . 'newsletter-subscribe-icon-place" id="' . $this->prefix . 'newsletter-subscribe-icon-place-after" value="after" ' . (isset($subscribe_icon_place) && $subscribe_icon_place == 'after' ? 'checked="checked"' : '') . '/> ' . __('After', $this->text_domain) . ' <i class="fa fa-indent"></i>
+					</label>
+				</div>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Text Color Field
+	 *
+	 * @access public
+	 * @param mixed $text_color
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_text_color( $text_color, $default = '', $help_text = null ) {
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Subscribe Button Text Color -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-text-color" class="col-sm-3 control-label">' . __('Subscribe Button Text Color', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input type="text" id="' . $this->prefix . 'newsletter-text-color" name="' . $this->prefix . 'newsletter-text-color" class="nnr-color-input" value="' .  (isset($text_color) ? $text_color : '#ffffff') . '"/>' .
+				$help_text .
+			'</div>
+		</div>';
+
+		return $code;
+
+	}
+
+	/**
+	 * Display Backgorund Color Field
+	 *
+	 * @access public
+	 * @param mixed $bg_color
+	 * @param string $default (default: '')
+	 * @param mixed $help_text (default: null)
+	 * @return void
+	 */
+	function display_bg_color( $bg_color, $default = '', $help_text = null ) {
+
+		if ( isset($help_text) ) {
+			$help_text = '<em class="help-block">' . __($help_text, $this->text_domain) . '</em>';
+		}
+
+		$code = '<!-- Subscribe Button Color -->
+		<div class="form-group">
+			<label for="' . $this->prefix . 'newsletter-bg-color" class="col-sm-3 control-label">' . __('Subscribe Button Color', $this->text_domain) . '</label>
+			<div class="col-sm-9">
+				<input type="text" id="' . $this->prefix . 'newsletter-bg-color" name="' . $this->prefix . 'newsletter-bg-color" class="nnr-color-input" value="' .  (isset($bg_color) ? $bg_color : '#f15928') . '"/>' .
 				$help_text .
 			'</div>
 		</div>';
@@ -880,7 +1285,20 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	function get_data() {
 
 		return array(
-			'newsletter'		=> isset($_POST[$this->prefix . 'newsletter']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter']) : '',
+			'newsletter'				=> isset($_POST[$this->prefix . 'newsletter']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter']) : '',
+			'first_name_placeholder'	=> isset($_POST[$this->prefix . 'newsletter-first-name-placeholder']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-first-name-placeholder']) : '',
+			'last_name_placeholder'		=> isset($_POST[$this->prefix . 'newsletter-last-name-placeholder']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-last-name-placeholder']) : '',
+			'email_placeholder'			=> isset($_POST[$this->prefix . 'newsletter-email-placeholder']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-email-placeholder']) : '',
+			'first_name'				=> isset($_POST[$this->prefix . 'newsletter-first-name']) && $_POST[$this->prefix . 'newsletter-first-name'] ? true : false,
+			'last_name'					=> isset($_POST[$this->prefix . 'newsletter-last-name']) && $_POST[$this->prefix . 'newsletter-last-name'] ? true : false,
+			'success_action'			=> isset($_POST[$this->prefix . 'newsletter-success-action']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-success-action']) : '',
+			'success_message'			=> isset($_POST[$this->prefix . 'newsletter-success-message']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-success-message']) : '',
+			'success_url'				=> isset($_POST[$this->prefix . 'newsletter-success-url']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-success-url']) : '',
+			'button_text'				=> isset($_POST[$this->prefix . 'newsletter-button-text']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-button-text']) : '',
+			'subscribe_icon'			=> isset($_POST[$this->prefix . 'newsletter-subscribe-icon']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-subscribe-icon']) : '',
+			'subscribe_icon_place'		=> isset($_POST[$this->prefix . 'newsletter-subscribe-icon-place']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-subscribe-icon-place']) : '',
+			'text_color'				=> isset($_POST[$this->prefix . 'newsletter-text-color']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-text-color']) : '',
+			'bg_color'					=> isset($_POST[$this->prefix . 'newsletter-bg-color']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-bg-color']) : '',
 			'mailchimp'			=> array(
 				'optin'			=> isset($_POST[$this->prefix . 'newsletter-mailchimp-optin']) && $_POST[$this->prefix . 'newsletter-mailchimp-optin'] ? true : false,
 				'api_key'		=> isset($_POST[$this->prefix . 'newsletter-mailchimp-api-key']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-mailchimp-api-key']) : '',

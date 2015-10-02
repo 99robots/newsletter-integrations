@@ -56,6 +56,16 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	public $table_name = '';
 
 	/**
+	 * data_manager_table_name
+	 *
+	 * (default value: '')
+	 *
+	 * @var string
+	 * @access public
+	 */
+	public $data_manager_table_name = '';
+
+	/**
 	 * Construtor
 	 *
 	 * @since 1.0.0
@@ -63,11 +73,13 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @param	N/A
 	 * @return	Instance
 	 */
-	function __construct( $table_name, $single = 'email', $plural = 'emails'  ) {
+	function __construct( $table_name, $data_manager_table_name = '', $single = 'email', $plural = 'emails'  ) {
 
         global $status, $page;
 
         $this->table_name = $table_name;
+        $this->data_manager_table_name = $data_manager_table_name;
+        $this->include_scripts();
 
         //Set parent defaults
 
@@ -76,6 +88,18 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
             'plural'    => $plural,    	//plural name of the listed records
             'ajax'      => false        	//does this table support ajax?
         ) );
+    }
+
+    function include_scripts() {
+	    // Styles
+
+	    wp_enqueue_style('bootstrap-datetimepicker-css', 	plugins_url( 'css/bootstrap-datetimepicker.min.css', dirname(__FILE__)));
+
+	    // Scripts
+
+		wp_enqueue_script('bootstrap-moment-js', 			plugins_url( 'js/moment.js', dirname(__FILE__)), array('jquery'));
+		wp_enqueue_script('bootstrap-datetimepicker-js', 	plugins_url( 'js/bootstrap-datetimepicker.min.js', dirname(__FILE__)), array('jquery', 'bootstrap-moment-js'));
+		wp_enqueue_script('newsletter-table-js', 			plugins_url( 'js/table.js', dirname(__FILE__)), array('jquery', 'bootstrap-moment-js'));
     }
 
 	/**
@@ -121,7 +145,17 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	function column_default( $item, $column_name ) {
 
 		if ( $column_name == 'source' ) {
+
+			if ( $this->data_manager_table_name != '' && class_exists('NNR_Data_Manager_v1') ) {
+				$data_manager = new NNR_Data_Manager_v1($this->data_manager_table_name);
+				return $data_manager->get_name_from_id($item['data_id']);
+			}
+
 			return $item['data_id'];
+		}
+
+		if ( $column_name == 'date' ) {
+			return date('Y-m-d', strtotime($item['date']));
 		}
 
 		return $item[$column_name];
@@ -151,7 +185,28 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 
         $current_page = $this->get_pagenum();
 
-        $this->items = $newsletter_emails->get_emails();
+        // Get Start and End Dates
+
+		$start_date = date('Y-m-d', mktime(0, 0, 0, date("m")-1, date("d"), date("Y")));
+		$end_date = date('Y-m-d', strtotime(current_time('mysql')));
+
+		if ( isset($_GET['start_date']) ) {
+			$post_start_date = urldecode($_GET['start_date']);
+		}
+
+		if ( isset($_GET['end_date']) ) {
+			$post_end_date = urldecode($_GET['end_date']);
+		}
+
+		if (isset($post_start_date) && $post_start_date != '') {
+			$start_date = date('Y-m-d', strtotime($post_start_date));
+		}
+
+		if (isset($post_end_date) && $post_end_date != '') {
+			$end_date = date('Y-m-d', strtotime($post_end_date));
+		}
+
+        $this->items = $newsletter_emails->get_emails($start_date, $end_date);
 
         $total_items = count($this->items);
 

@@ -26,6 +26,18 @@ jQuery(document).ready(function($) {
 
 	});
 
+	$("." + nnr_new_int_data.prefix + "newsletter-success-action").hide();
+	$("." + nnr_new_int_data.prefix + "newsletter-success-action-" + $("#" + nnr_new_int_data.prefix + "newsletter-success-action").val()).show();
+
+ 	$("#" + nnr_new_int_data.prefix + "newsletter-success-action").change(function() {
+ 		$("." + nnr_new_int_data.prefix + "newsletter-success-action").hide();
+ 		$("." + nnr_new_int_data.prefix + "newsletter-success-action-" + $(this).val()).show();
+
+ 	});
+
+ 	$('.nnr-color-input').wpColorPicker();
+ 	$('button[role="iconpicker"]').iconpicker().iconpicker('setCols', 10).iconpicker('setRows', 5);
+
 	/* =====================================================================================
 	 *
 	 * MailChimp
