@@ -75,6 +75,8 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	 */
 	function __construct( $prefix = '', $text_domain = '', $table_name = '', $newsletter_table_name = '', $stats_table_name = '' ) {
 
+		do_action('nnr_news_int_before_new_form_view_v1');
+
 		$this->prefix = $prefix;
 		$this->text_domain = $text_domain;
 		$this->table_name = $table_name;
@@ -82,6 +84,8 @@ class NNR_Newsletter_Integrations_Form_v1 {
 		$this->stats_table_name = $stats_table_name;
 
 		$this->include_scripts();
+
+		do_action('nnr_news_int_after_new_form_view_v1');
 
 	}
 
@@ -93,12 +97,16 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	 */
 	function include_scripts() {
 
+		do_action('nnr_news_int_before_form_include_scripts_v1');
+
 		wp_register_script( 'newsletter-integrations-form-js', plugins_url( 'js/newsletter-integrations.js', dirname(__FILE__)), array('jquery') );
 		wp_enqueue_script( 'newsletter-integrations-form-js' );
-		wp_localize_script( 'newsletter-integrations-form-js', 'nnr_new_int_form_data' , array(
+		wp_localize_script( 'newsletter-integrations-form-js', 'nnr_new_int_form_data', apply_filters('nnr_news_int_form_include_scripts_data_v1', array(
 			'prefix'		=> $this->prefix,
 			'ajaxurl'       => admin_url( 'admin-ajax.php' ),
-		));
+		) ) );
+
+		do_action('nnr_news_int_after_form_include_scripts_v1');
 
 	}
 
@@ -109,6 +117,8 @@ class NNR_Newsletter_Integrations_Form_v1 {
 	 * @return void
 	 */
 	function display_form( $data_id, $newsletter, $args = array() ) {
+
+		do_action('nnr_news_int_before_form_display_v1');
 
 		// Do not output form if data id is not provided
 
@@ -214,7 +224,9 @@ class NNR_Newsletter_Integrations_Form_v1 {
 
 		$code .= '</div>';
 
-		return $code;
+		do_action('nnr_news_int_after_form_display_v1');
+
+		return apply_filters('nnr_news_int_form_display_v1', $code);
 
 	}
 

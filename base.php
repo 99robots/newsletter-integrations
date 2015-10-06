@@ -25,7 +25,7 @@ class NNR_Newsletter_Integrations_Base_v1 {
 	 * @return void
 	 */
 	function sanitize_value( $value, $html = false ) {
-		return stripcslashes( sanitize_text_field( $value ) );
+		return apply_filters('nnr_news_int_sanitize_value_v1', stripcslashes( sanitize_text_field( $value ) ) );
 	}
 
 }

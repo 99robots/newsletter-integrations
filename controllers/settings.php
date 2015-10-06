@@ -66,10 +66,14 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	 */
 	function __construct( $prefix = '', $text_domain = '' ) {
 
+		do_action('nnr_news_int_before_new_settings_controller_v1');
+
 		$this->prefix = $prefix;
 		$this->text_domain = $text_domain;
 
 		$this->include_scripts();
+
+		do_action('nnr_news_int_after_new_settings_controller_v1');
 	}
 
 	/**
@@ -79,6 +83,8 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	 * @return void
 	 */
 	function include_scripts() {
+
+		do_action('nnr_news_int_before_settings_include_scripts_v1');
 
 		wp_register_style( 'selectize-css', plugins_url( 'css/selectize.bootstrap3.css', dirname(__FILE__)) );
 		wp_enqueue_style( 'selectize-css' );
@@ -91,10 +97,12 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 
 		wp_register_script( 'newsletter-integrations-js', plugins_url( 'js/settings.js', dirname(__FILE__)), array('jquery', 'wp-color-picker') );
 		wp_enqueue_script( 'newsletter-integrations-js' );
-		wp_localize_script( 'newsletter-integrations-js', 'nnr_new_int_data' , array(
+		wp_localize_script( 'newsletter-integrations-js', 'nnr_new_int_data', apply_filters('nnr_news_int_settings_scripts_data_v1', array(
 			'prefix'		=> $this->prefix,
 			'ajaxurl'       => admin_url( 'admin-ajax.php' ),
-		));
+		) ) );
+
+		do_action('nnr_news_int_after_settings_include_scripts_v1');
 
 	}
 
@@ -108,6 +116,8 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	 * @return void
 	 */
 	function display_all_settings( $newsletter_settings, $args = array('default' => array(), 'help-text' => array()) ) {
+
+		do_action('nnr_news_int_before_settings_display_all_v1');
 
 		echo $this->display_newsletter_service($newsletter_settings['newsletter']);
 		echo $this->display_mailchimp_optin($newsletter_settings['mailchimp']['optin']);
@@ -160,6 +170,8 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 		echo $this->display_subscribe_icon_place($newsletter_settings['subscribe_icon_place']);
 		echo $this->display_text_color($newsletter_settings['text_color']);
 		echo $this->display_bg_color($newsletter_settings['bg_color']);
+
+		do_action('nnr_news_int_after_settings_display_all_v1');
 
 	}
 
@@ -1284,7 +1296,7 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 	 */
 	function get_data() {
 
-		return array(
+		return apply_filters('nnr_news_int_settings_get_data_v1', array(
 			'newsletter'				=> isset($_POST[$this->prefix . 'newsletter']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter']) : '',
 			'first_name_placeholder'	=> isset($_POST[$this->prefix . 'newsletter-first-name-placeholder']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-first-name-placeholder']) : '',
 			'last_name_placeholder'		=> isset($_POST[$this->prefix . 'newsletter-last-name-placeholder']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-last-name-placeholder']) : '',
@@ -1341,22 +1353,21 @@ class NNR_Newsletter_Integrations_Settings_v1 extends NNR_Newsletter_Integration
 			'feedburner'			=> array(
 				'id'				=> isset($_POST[$this->prefix . 'newsletter-feedburner-id']) ? $this->sanitize_value($_POST[$this->prefix . 'newsletter-feedburner-id']) : '',
 			),
-		);
-
+		) );
 	}
 }
 
 // AJAX Actions for retieving list data
 
-add_action( 'wp_ajax_nnr_new_int_get_mailchimp_lists', 			'nnr_new_int_get_mailchimp_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_aweber_lists', 			'nnr_new_int_get_aweber_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_getresponse_lists', 		'nnr_new_int_get_getresponse_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_campaignmonitor_lists', 	'nnr_new_int_get_campaignmonitor_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_update_campaignmonitor_lists', 'nnr_new_int_update_campaignmonitor_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_madmimi_lists', 			'nnr_new_int_get_madmimi_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_infusionsoft_lists', 		'nnr_new_int_get_infusionsoft_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_mymail_lists', 			'nnr_new_int_get_mymail_lists_v1');
-add_action( 'wp_ajax_nnr_new_int_get_activecampaign_lists', 	'nnr_new_int_get_activecampaign_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_mailchimp_lists_v1', 			'nnr_new_int_get_mailchimp_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_aweber_lists_v1', 				'nnr_new_int_get_aweber_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_getresponse_lists_v1', 		'nnr_new_int_get_getresponse_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_campaignmonitor_lists_v1', 	'nnr_new_int_get_campaignmonitor_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_update_campaignmonitor_lists_v1', 	'nnr_new_int_update_campaignmonitor_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_madmimi_lists_v1', 			'nnr_new_int_get_madmimi_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_infusionsoft_lists_v1', 		'nnr_new_int_get_infusionsoft_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_mymail_lists_v1', 				'nnr_new_int_get_mymail_lists_v1');
+add_action( 'wp_ajax_nnr_new_int_get_activecampaign_lists_v1', 		'nnr_new_int_get_activecampaign_lists_v1');
 
 /**
  * Get all Mailchimp Lists
@@ -1365,6 +1376,8 @@ add_action( 'wp_ajax_nnr_new_int_get_activecampaign_lists', 	'nnr_new_int_get_ac
  * @return void
  */
 function nnr_new_int_get_mailchimp_lists_v1() {
+
+	do_action('nnr_news_int_before_get_mailchimp_lists_v1');
 
 	$options = '';
 
@@ -1394,7 +1407,9 @@ function nnr_new_int_get_mailchimp_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_after_get_mailchimp_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_mailchimp_lists_v1', $options);
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1406,6 +1421,8 @@ function nnr_new_int_get_mailchimp_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_aweber_lists_v1() {
+
+	do_action('nnr_news_int_before_get_aweber_lists_v1');
 
 	$options = '';
 	$consumerKey = '';
@@ -1471,13 +1488,15 @@ function nnr_new_int_get_aweber_lists_v1() {
 		} catch (AWeberAPIException $exc) { error_log($exc); }
 	}
 
-	echo json_encode(array(
+	do_action('nnr_news_int_after_get_aweber_lists_v1');
+
+	echo json_encode( apply_filters('nnr_news_int_get_aweber_lists_v1', array(
 		'html'               => $options,
 		'consumer_key'       => $consumerKey,
 		'consumer_secret'    => $consumerSecret,
 		'access_key'         => $accessKey,
 		'access_secret'      => $accessSecret,
-	));
+	) ) );
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1489,6 +1508,8 @@ function nnr_new_int_get_aweber_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_getresponse_lists_v1() {
+
+	do_action('nnr_news_int_before_get_getresponse_lists_v1');
 
 	$options = '';
 
@@ -1526,7 +1547,9 @@ function nnr_new_int_get_getresponse_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_after_get_getresponse_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_getresponse_lists_v1', $options);
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1538,6 +1561,8 @@ function nnr_new_int_get_getresponse_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_campaignmonitor_lists_v1() {
+
+	do_action('nnr_news_int_before_get_campaignmonitor_lists_v1');
 
 	$lists = '';
 	$clients = '';
@@ -1596,7 +1621,9 @@ function nnr_new_int_get_campaignmonitor_lists_v1() {
 		}
 	}
 
-	echo json_encode(array('clients' => $clients, 'lists' => $lists));
+	do_action('nnr_news_int_after_get_campaignmonitor_lists_v1');
+
+	echo json_encode( apply_filters('nnr_news_int_get_campaignmonitor_lists_v1', array('clients' => $clients, 'lists' => $lists) ) );
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1608,6 +1635,8 @@ function nnr_new_int_get_campaignmonitor_lists_v1() {
  * @return void
  */
 function nnr_new_int_update_campaignmonitor_lists_v1() {
+
+	do_action('nnr_news_int_before_update_campaignmonitor_lists_v1');
 
 	$lists = '';
 
@@ -1629,7 +1658,9 @@ function nnr_new_int_update_campaignmonitor_lists_v1() {
 		}
 	}
 
-	echo $lists;
+	do_action('nnr_news_int_after_update_campaignmonitor_lists_v1');
+
+	echo apply_filters('nnr_news_int_update_campaignmonitor_lists_v1', $lists);
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1641,6 +1672,8 @@ function nnr_new_int_update_campaignmonitor_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_madmimi_lists_v1() {
+
+	do_action('nnr_news_int_before_get_madmimi_lists_v1');
 
 	$options = '';
 
@@ -1677,7 +1710,9 @@ function nnr_new_int_get_madmimi_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_after_get_madmimi_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_madmimi_lists_v1', $options);
 
 	die(); // this is required to terminate immediately and return a proper response
 }
@@ -1689,6 +1724,8 @@ function nnr_new_int_get_madmimi_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_infusionsoft_lists_v1() {
+
+	do_action('nnr_news_int_before_get_infusionsoft_lists_v1');
 
 	if ( ! function_exists( 'curl_init' ) ) {
 		return __( 'curl_init is not defined ', 'bloom' );
@@ -1744,7 +1781,9 @@ function nnr_new_int_get_infusionsoft_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_after_get_infusionsoft_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_infusionsoft_lists_v1', $options);
 
 	die(); // this is required to terminate immediately and return a proper response
 
@@ -1757,6 +1796,8 @@ function nnr_new_int_get_infusionsoft_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_mymail_lists_v1() {
+
+	do_action('nnr_news_int_before_get_mymail_lists_v1');
 
 	if ( !function_exists('mymail') ) {
 		echo '';
@@ -1774,7 +1815,9 @@ function nnr_new_int_get_mymail_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_after_get_mymail_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_mymail_lists_v1', $options);
 	die();
 }
 
@@ -1785,6 +1828,8 @@ function nnr_new_int_get_mymail_lists_v1() {
  * @return void
  */
 function nnr_new_int_get_activecampaign_lists_v1() {
+
+	do_action('nnr_news_int_before_get_activecampaign_lists_v1');
 
 	require_once( dirname(dirname(__FILE__)) . '/services/activecampaign/ActiveCampaign.class.php' );
 
@@ -1817,7 +1862,9 @@ function nnr_new_int_get_activecampaign_lists_v1() {
 		}
 	}
 
-	echo $options;
+	do_action('nnr_news_int_before_get_activecampaign_lists_v1');
+
+	echo apply_filters('nnr_news_int_get_activecampaign_lists_v1', $options);
 	die();
 }
 

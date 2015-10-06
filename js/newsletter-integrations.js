@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
 	    event.preventDefault();
 
 		var data = {
-			'action': 'nnr_new_int_add_email',
+			'action': 'nnr_new_int_add_email_v1',
 			'data_id': $(this).attr('data-id'),
 			'text_domain': $(this).attr('data-text-domain'),
 			'table_name': $(this).attr('data-table-name'),

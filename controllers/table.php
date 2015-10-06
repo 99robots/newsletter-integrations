@@ -73,7 +73,9 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @param	N/A
 	 * @return	Instance
 	 */
-	function __construct( $table_name, $data_manager_table_name = '', $single = 'email', $plural = 'emails'  ) {
+	function __construct( $table_name, $data_manager_table_name = '', $single = 'email', $plural = 'emails' ) {
+
+		do_action('nnr_news_int_before_new_table_controller_v1');
 
         global $status, $page;
 
@@ -88,9 +90,14 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
             'plural'    => $plural,    	//plural name of the listed records
             'ajax'      => false        	//does this table support ajax?
         ) );
+
+        do_action('nnr_news_int_after_new_table_controller_v1');
     }
 
     function include_scripts() {
+
+	    do_action('nnr_news_int_before_table_include_scripts_v1');
+
 	    // Styles
 
 	    wp_enqueue_style('bootstrap-datetimepicker-css', 	plugins_url( 'css/bootstrap-datetimepicker.min.css', dirname(__FILE__)));
@@ -100,6 +107,8 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 		wp_enqueue_script('bootstrap-moment-js', 			plugins_url( 'js/moment.js', dirname(__FILE__)), array('jquery'));
 		wp_enqueue_script('bootstrap-datetimepicker-js', 	plugins_url( 'js/bootstrap-datetimepicker.min.js', dirname(__FILE__)), array('jquery', 'bootstrap-moment-js'));
 		wp_enqueue_script('newsletter-table-js', 			plugins_url( 'js/table.js', dirname(__FILE__)), array('jquery', 'bootstrap-moment-js'));
+
+		do_action('nnr_news_int_after_table_include_scripts_v1');
     }
 
 	/**
@@ -111,7 +120,7 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @return	N/A
 	 */
 	function no_items() {
-		_e( 'No emails found.' );
+		return apply_filters('nnr_news_int_table_no_items_v1', _e( 'No emails found.' ) );
 	}
 
 	/**
@@ -123,6 +132,9 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @return	array An associative array containing column information: 'slugs'=>'Visible Titles'
 	 */
 	function get_columns(){
+
+		do_action('nnr_news_int_before_table_get_columns_v1');
+
 		$columns = array(
 			'date'        	 	 => __( 'Date' ),
 			'email'              => __( 'Email' ),
@@ -130,7 +142,10 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 			'last_name'          => __( 'Last Name' ),
 			'source'        	 => __( 'Source' ),
 		);
-		return $columns;
+
+		do_action('nnr_news_int_after_table_get_columns_v1');
+
+		return apply_filters('nnr_news_int_table_get_columns_v1', $columns );
 	}
 
 	/**
@@ -143,6 +158,8 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @return	string Text or HTML to be placed inside the column <td>
 	 */
 	function column_default( $item, $column_name ) {
+
+		do_action('nnr_news_int_before_table_column_default_v1');
 
 		if ( $column_name == 'source' ) {
 
@@ -158,7 +175,9 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 			return date('Y-m-d', strtotime($item['date']));
 		}
 
-		return $item[$column_name];
+		do_action('nnr_news_int_after_table_column_default_v1');
+
+		return apply_filters('nnr_news_int_table_column_default_v1', $item[$column_name] );
 	}
 
 	/**
@@ -170,6 +189,8 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @return	N/A
 	 */
 	function prepare_items() {
+
+		do_action('nnr_news_int_before_table_prepare_items_v1');
 
 		$newsletter_emails = new NNR_Newsletter_Integrations_Submission_v1( $this->table_name );
 
@@ -208,6 +229,8 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 
         $this->items = $newsletter_emails->get_emails($start_date, $end_date);
 
+        $this->items = apply_filters('nnr_news_int_table_items_v1', $this->items );
+
         $total_items = count($this->items);
 
         /**
@@ -217,11 +240,13 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
          */
         $data = array_slice($this->items,(($current_page-1)*$per_page),$per_page);
 
-        $this->set_pagination_args( array(
-            'total_items' => $total_items,                  //WE have to calculate the total number of items
-            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
-            'total_pages' => ceil($total_items/$per_page)   //WE have to calculate the total number of pages
-        ) );
+        $this->set_pagination_args( apply_filters('nnr_news_int_table_set_pagination_args_v1', array(
+            'total_items' => $total_items,
+            'per_page'    => $per_page,
+            'total_pages' => ceil($total_items/$per_page)
+        ) ) );
+
+        do_action('nnr_news_int_after_table_prepare_items_v1');
 	}
 
 	/**
@@ -233,7 +258,7 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 	 * @return array
 	 */
 	public function get_table_classes() {
-	    return array('table table-striped table-responsive');
+	    return apply_filters('nnr_news_int_table_get_table_classes_v1', array('table table-striped table-responsive') );
 	}
 
 	/**

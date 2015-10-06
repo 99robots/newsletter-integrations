@@ -1,3 +1,5 @@
+<?php do_action('nnr_news_int_before_table_filters_v1'); ?>
+
 <div id="nnr-before-table" class="col-xs-12 pull-right">
 	<form method="get" class="form-inline" role="form">
 
@@ -50,6 +52,9 @@
 </div>
 <br />
 
+<?php do_action('nnr_news_int_after_table_filters_v1'); ?>
+<?php do_action('nnr_news_int_before_table_display_v1'); ?>
+
 <form method="GET">
 	<?php
 	$newsletter_emails_table = new NNR_Newsletter_Integrations_List_Table_v1( self::$newsletter_table_name, self::$data_manager_table_name );
@@ -57,3 +62,5 @@
 	$newsletter_emails_table->display();
 	?>
 </form>
+
+<?php do_action('nnr_news_int_after_table_display_v1'); ?>

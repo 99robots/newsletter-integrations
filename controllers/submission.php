@@ -56,7 +56,11 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 	 */
 	function __construct( $table_name = '' ) {
 
+		do_action('nnr_news_int_before_new_submission_controller_v1');
+
 		$this->table_name = $table_name;
+
+		do_action('nnr_news_int_after_new_submission_controller_v1');
 
 	}
 
@@ -69,9 +73,11 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 	 */
 	function create_table(){
 
+		do_action('nnr_news_int_before_submission_create_table_v1');
+
 		global $wpdb;
 
-		$wpdb->query("
+		$wpdb->query( apply_filters('nnr_news_int_submission_create_table_v1',  "
 			CREATE TABLE IF NOT EXISTS " . $this->get_table_name() . " (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`date` datetime NOT NULL,
@@ -81,8 +87,9 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 				`last_name` varchar(50) NOT NULL DEFAULT '',
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-		");
+		" ) );
 
+		do_action('nnr_news_int_after_submission_create_table_v1');
 	}
 
 	/**
@@ -94,11 +101,13 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 	 */
 	function add_data( $data = array() ) {
 
+		do_action('nnr_news_int_before_submission_add_data_v1');
+
 		global $wpdb;
 
 		$today = date('Y-m-d');
 
-		$result = $wpdb->query($wpdb->prepare('INSERT IGNORE INTO `' . $this->get_table_name() . '` (
+		$result = $wpdb->query( apply_filters('nnr_news_int_submission_add_data_v1', $wpdb->prepare('INSERT IGNORE INTO `' . $this->get_table_name() . '` (
 			`date`,
 			`data_id`,
 			`email`,
@@ -110,7 +119,9 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 			$data['email'],
 			$data['first_name'],
 			$data['last_name']
-		));
+		) ) );
+
+		do_action('nnr_news_int_after_submission_add_data_v1');
 
 		// Return the recently created id for this entry
 
@@ -129,6 +140,8 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 	 * @return void
 	 */
 	function get_emails($start = null, $end = null, $email = null, $select = '*') {
+
+		do_action('nnr_news_int_before_submission_get_emails_v1');
 
 		$query = null;
 
@@ -164,7 +177,9 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 			return false;
 		}
 
-		$result = $wpdb->get_results($query, 'ARRAY_A');
+		$result = $wpdb->get_results( apply_filters('nnr_news_int_submission_get_emails_v1', $query ), 'ARRAY_A');
+
+		do_action('nnr_news_int_after_submission_get_emails_v1');
 
 		return $result;
 	}
@@ -178,6 +193,8 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 	 */
 	function delete_email($email) {
 
+		do_action('nnr_news_int_before_submission_delete_email_v1');
+
 		// Return false if data_id is not set
 
 		if ( !isset($email) ) {
@@ -188,7 +205,9 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 
 		// Delete Email
 
-		$result = $wpdb->query($wpdb->prepare('DELETE FROM `' . $this->get_table_name() . '` WHERE `email` = %d', $email));
+		$result = $wpdb->query( apply_filters('nnr_news_int_submission_delete_email_v1', $wpdb->prepare('DELETE FROM `' . $this->get_table_name() . '` WHERE `email` = %d', $email) ) );
+
+		do_action('nnr_news_int_after_submission_delete_email_v1');
 
 		return $result;
 
@@ -205,13 +224,13 @@ class NNR_Newsletter_Integrations_Submission_v1 {
 
 		global $wpdb;
 
-		return $wpdb->prefix . $this->table_name;
+		return apply_filters('nnr_news_int_submission_get_table_name_v1', $wpdb->prefix . $this->table_name );
 	}
 
 }
 
-add_action( 'wp_ajax_nnr_new_int_add_email', 			'nnr_new_int_add_email_v1');
-add_action( 'wp_ajax_nopriv_nnr_new_int_add_email', 	'nnr_new_int_add_email_v1');
+add_action( 'wp_ajax_nnr_new_int_add_email_v1', 			'nnr_new_int_add_email_v1');
+add_action( 'wp_ajax_nopriv_nnr_new_int_add_email_v1', 		'nnr_new_int_add_email_v1');
 
 /**
  * Record an impression made by a optin fire
@@ -222,6 +241,8 @@ add_action( 'wp_ajax_nopriv_nnr_new_int_add_email', 	'nnr_new_int_add_email_v1')
  * @return void
  */
 function nnr_new_int_add_email_v1() {
+
+	do_action('nnr_news_int_before_submission_add_email_v1');
 
 	// No First Name
 
@@ -292,13 +313,15 @@ function nnr_new_int_add_email_v1() {
 
 		if ($result) {
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -362,7 +385,7 @@ function nnr_new_int_add_email_v1() {
 
             if (isset($result['email'])) {
 
-	            do_action('nnr_news_int_submission_success', $_POST['data_id'], $_POST['stats_table_name']);
+	            do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 				echo json_encode(array(
 					'id'				=> $_POST['data_id'],
@@ -370,7 +393,7 @@ function nnr_new_int_add_email_v1() {
 					'success_action'	=> $success_action,
 					'url'				=> $success_url,
 					'message'			=> $success_mesage,
-					'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 						'data_id' 		=> $_POST['data_id'],
 						'table_name'	=> $_POST['stats_table_name']
 					)),
@@ -420,13 +443,15 @@ function nnr_new_int_add_email_v1() {
 
 			$newSubscriber = $list->subscribers->create($subscriber);
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -463,13 +488,15 @@ function nnr_new_int_add_email_v1() {
 			    )
 			);
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -522,13 +549,15 @@ function nnr_new_int_add_email_v1() {
 
 		if ($result->was_successful()) {
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -583,13 +612,15 @@ function nnr_new_int_add_email_v1() {
 				'last_name'		=> $_POST['last_name'],
 			));
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -641,13 +672,15 @@ function nnr_new_int_add_email_v1() {
 
 					$infusion_app->grpAssign( $contact_data[0]['Id'], $data_instance['args']['newsletter']['infusionsoft']['list'] );
 
+					do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 					echo json_encode(array(
 						'id'				=> $_POST['data_id'],
 						'status'			=> 'check',
 						'success_action'	=> $success_action,
 						'url'				=> $success_url,
 						'message'			=> $success_mesage,
-						'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+						'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 							'data_id' 		=> $_POST['data_id'],
 							'table_name'	=> $_POST['stats_table_name']
 						)),
@@ -676,13 +709,15 @@ function nnr_new_int_add_email_v1() {
 
 				$infusion_app->grpAssign( $new_contact_id, $data_instance['args']['newsletter']['infusionsoft']['list'] );
 
+				do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 				echo json_encode(array(
 					'id'				=> $_POST['data_id'],
 					'status'			=> 'check',
 					'success_action'	=> $success_action,
 					'url'				=> $success_url,
 					'message'			=> $success_mesage,
-					'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+					'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 						'data_id' 		=> $_POST['data_id'],
 						'table_name'	=> $_POST['stats_table_name']
 					)),
@@ -726,13 +761,15 @@ function nnr_new_int_add_email_v1() {
 
             mymail('subscribers')->assign_lists($subscriber_id, array($data_instance['args']['newsletter']['mymail']['list']));
 
+            do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -785,13 +822,15 @@ function nnr_new_int_add_email_v1() {
 
 		if ( (int) $contact_sync->success ) {
 
+			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
+
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
 				'success_action'	=> $success_action,
 				'url'				=> $success_url,
 				'message'			=> $success_mesage,
-				'conversion'		=> apply_filters('nnr_news_int_submission_success', array(
+				'conversion'		=> apply_filters('nnr_news_int_submission_success_v1', array(
 					'data_id' 		=> $_POST['data_id'],
 					'table_name'	=> $_POST['stats_table_name']
 				)),
@@ -811,11 +850,13 @@ function nnr_new_int_add_email_v1() {
 		}
 	}
 
-	echo json_encode(array(
+	do_action('nnr_news_int_after_submission_add_email_v1');
+
+	echo json_encode( apply_filters('nnr_news_int_submission_add_email_v1', array(
 		'id'		=> $_POST['data_id'],
 		'status'	=> 'warning',
 		'message'	=> __('Unable to subscribe user. Newsletter not setup properly.', $_POST['text_domain'])
-	));
+	) ) );
 
 	die(); // this is required to terminate immediately and return a proper response
 }

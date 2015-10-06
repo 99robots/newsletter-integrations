@@ -70,7 +70,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-mailchimp-list');
 
 	var data = {
-		'action': 'nnr_new_int_get_mailchimp_lists',
+		'action': 'nnr_new_int_get_mailchimp_lists_v1',
 		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-mailchimp-api-key').val(),
 		'list': $('#' + nnr_new_int_data.prefix + 'newsletter-mailchimp-list').attr('data-list'),
 	};
@@ -145,7 +145,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-aweber-list-id');
 
 	var data = {
-		'action': 'nnr_new_int_get_aweber_lists',
+		'action': 'nnr_new_int_get_aweber_lists_v1',
 		'consumer_key': $('#' + nnr_new_int_data.prefix + 'newsletter-aweber-consumer-key').val(),
 		'consumer_secret': $('#' + nnr_new_int_data.prefix + 'newsletter-aweber-consumer-secret').val(),
 		'access_key': $('#' + nnr_new_int_data.prefix + 'newsletter-aweber-access-key').val(),
@@ -204,7 +204,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-getresponse-campaign');
 
 	var data = {
-		'action': 'nnr_new_int_get_getresponse_lists',
+		'action': 'nnr_new_int_get_getresponse_lists_v1',
 		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-getresponse-api-key').val(),
 		'campaign': $('#' + nnr_new_int_data.prefix + 'newsletter-getresponse-campaign').attr('data-campaign')
 	};
@@ -246,6 +246,13 @@ jQuery(document).ready(function($) {
 
 		});
 	});
+
+	var data = {
+		'action': 'nnr_new_int_get_campaignmonitor_lists_v1',
+		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-api-key').val(),
+		'client': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-client').attr('data-client'),
+		'list': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-list').attr('data-list'),
+	};
 
 	$.post(ajaxurl, data, function(response) {
 
@@ -294,13 +301,6 @@ jQuery(document).ready(function($) {
 	$('<i class="' + nnr_new_int_data.prefix + 'campaignmonitor-get-lists-spinner fa fa-spinner fa-spin"></i>')
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-campaignmonitor-client');
 
-	var data = {
-		'action': 'nnr_new_int_get_campaignmonitor_lists',
-		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-api-key').val(),
-		'client': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-client').attr('data-client'),
-		'list': $('#' + nnr_new_int_data.prefix + 'newsletter-campaignmonitor-list').attr('data-list'),
-	};
-
 	/* =====================================================================================
 	 *
 	 * Mad Mimi
@@ -334,7 +334,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-madmimi-list');
 
 	var data = {
-		'action': 'nnr_new_int_get_madmimi_lists',
+		'action': 'nnr_new_int_get_madmimi_lists_v1',
 		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-madmimi-api-key').val(),
 		'username': $('#' + nnr_new_int_data.prefix + 'newsletter-madmimi-username').val(),
 		'list': $('#' + nnr_new_int_data.prefix +'newsletter-madmimi-list').attr('data-list')
@@ -378,7 +378,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-infusionsoft-list');
 
 	var data = {
-		'action': 'nnr_new_int_get_infusionsoft_lists',
+		'action': 'nnr_new_int_get_infusionsoft_lists_v1',
 		'app_id': $('#' + nnr_new_int_data.prefix + 'newsletter-infusionsoft-app-id').val(),
 		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-infusionsoft-api-key').val(),
 		'list': $('#' + nnr_new_int_data.prefix +'newsletter-infusionsoft-list').attr('data-list')
@@ -420,7 +420,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-mymail-list');
 
 	var data = {
-		'action': 'nnr_new_int_get_mymail_lists',
+		'action': 'nnr_new_int_get_mymail_lists_v1',
 		'list': $('#' + nnr_new_int_data.prefix +'newsletter-mymail-list').attr('data-list')
 	};
 
@@ -462,7 +462,7 @@ jQuery(document).ready(function($) {
 		.insertAfter('#' + nnr_new_int_data.prefix +'newsletter-activecampaign-list');
 
 	var data = {
-		'action': 'nnr_new_int_get_activecampaign_lists',
+		'action': 'nnr_new_int_get_activecampaign_lists_v1',
 		'app_url': $('#' + nnr_new_int_data.prefix + 'newsletter-activecampaign-app-url').val(),
 		'api_key': $('#' + nnr_new_int_data.prefix + 'newsletter-activecampaign-api-key').val(),
 		'list': $('#' + nnr_new_int_data.prefix +'newsletter-activecampaign-list').attr('data-list')
