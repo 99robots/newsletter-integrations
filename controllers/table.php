@@ -227,7 +227,7 @@ class NNR_Newsletter_Integrations_List_Table_v1 extends WP_List_Table {
 			$end_date = date('Y-m-d', strtotime($post_end_date));
 		}
 
-        $this->items = $newsletter_emails->get_emails($start_date, $end_date);
+        $this->items = array_reverse($newsletter_emails->get_emails($start_date, $end_date));
 
         $this->items = apply_filters('nnr_news_int_table_items_v1', $this->items );
 

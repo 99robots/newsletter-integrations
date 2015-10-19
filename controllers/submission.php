@@ -313,8 +313,6 @@ function nnr_new_int_add_email_v1() {
 
 		if ($result) {
 
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
-
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
@@ -385,8 +383,6 @@ function nnr_new_int_add_email_v1() {
 
             if (isset($result['email'])) {
 
-	            do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
-
 				echo json_encode(array(
 					'id'				=> $_POST['data_id'],
 					'status'			=> 'check',
@@ -443,8 +439,6 @@ function nnr_new_int_add_email_v1() {
 
 			$newSubscriber = $list->subscribers->create($subscriber);
 
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
-
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
@@ -487,8 +481,6 @@ function nnr_new_int_add_email_v1() {
 			        'email'     => $_POST['email'],
 			    )
 			);
-
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
@@ -548,8 +540,6 @@ function nnr_new_int_add_email_v1() {
 		));
 
 		if ($result->was_successful()) {
-
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
@@ -612,8 +602,6 @@ function nnr_new_int_add_email_v1() {
 				'last_name'		=> $_POST['last_name'],
 			));
 
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
-
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
 				'status'			=> 'check',
@@ -672,8 +660,6 @@ function nnr_new_int_add_email_v1() {
 
 					$infusion_app->grpAssign( $contact_data[0]['Id'], $data_instance['args']['newsletter']['infusionsoft']['list'] );
 
-					do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
-
 					echo json_encode(array(
 						'id'				=> $_POST['data_id'],
 						'status'			=> 'check',
@@ -708,8 +694,6 @@ function nnr_new_int_add_email_v1() {
 				) );
 
 				$infusion_app->grpAssign( $new_contact_id, $data_instance['args']['newsletter']['infusionsoft']['list'] );
-
-				do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 				echo json_encode(array(
 					'id'				=> $_POST['data_id'],
@@ -760,8 +744,6 @@ function nnr_new_int_add_email_v1() {
         if ( !is_wp_error($subscriber_id) ) {
 
             mymail('subscribers')->assign_lists($subscriber_id, array($data_instance['args']['newsletter']['mymail']['list']));
-
-            do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
@@ -821,8 +803,6 @@ function nnr_new_int_add_email_v1() {
 		));
 
 		if ( (int) $contact_sync->success ) {
-
-			do_action('nnr_news_int_submission_success_v1', $_POST['data_id'], $_POST['stats_table_name']);
 
 			echo json_encode(array(
 				'id'				=> $_POST['data_id'],
